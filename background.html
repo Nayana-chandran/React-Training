@@ -1,0 +1,78 @@
+<html>
+<head>
+<title>Background changes</title>
+</head>
+    <script src="jscolor.js"></script>
+    <body >
+        <div id="background">
+             <select id="selectbackground" onchange="changeFunc(this.value);">
+                <option value="select">Choose any option</option>
+                <option value="color" >Color Picker</option>
+                <option value="image" >Image upload</option>
+                <option value="video" >Video Upload</option>
+              </select>
+        </div>
+        <button id="colorpicker" class="jscolor {valueElement:'chosen-value', onFineChange:'setTextColor(this)'}" style="display:none;">Pick olor</button>
+        <div id="backgroundImage" style="display:none;">
+            <label for="imageupload">Choose a background Image:</label>
+            <input type="file" id="bckimag" name="bckimag" accept="image/png, image/jpeg" onchange="readImage(event);">
+            <img id="format_background"/>
+        </div>
+        <div id="backgroundVideo" style="display:none;">
+            <label for="videoupload">Choose a background Video:</label>
+            <input type="file" id="bckvideo" name="bckvideo" onchange="readVideo(event);">
+            <video id="video"  type="video/webm">
+            </video>
+        </div>
+    </body>
+</html>
+
+
+<script>
+    function setTextColor(picker) {
+        document.getElementById('format_background').style.backgroundColor =  picker.toString();
+    }
+
+    function hideShow(hide1, hide2, show) {
+        document.getElementById(hide1).style.display = "none";
+        document.getElementById(hide2).style.display = "none";
+        document.getElementById(show).style.display = "block";
+    }
+	
+    function changeFunc(picker) {
+        if(picker == 'color') {
+            hideShow('backgroundImage', 'backgroundVideo', 'colorpicker');
+        } else if(picker == 'image') {
+            hideShow('colorpicker', 'backgroundVideo', 'backgroundImage');
+        } else if(picker == 'video') {
+            hideShow('backgroundImage', 'colorpicker', 'backgroundVideo');
+        }
+    }
+	
+	// Read and set the browsed image in background
+    function readImage(event) {
+        var reader = new FileReader();
+        reader.onload = function() {
+            backImage = reader.result;
+            document.body.style.backgroundImage = "url(" + backImage + ")";
+            document.body.style.backgroundRepeat = "repeat-y";
+        }
+        reader.readAsDataURL(event.target.files[0]);
+    }
+    
+	// Read and play the browsed video in screen
+    function readVideo(event) {
+        var video = document.getElementById('video');
+        var source = document.createElement('source');
+        var reader = new FileReader();
+        reader.onload = function() {
+            backVideo = reader.result;
+            source.setAttribute('src', backVideo);
+            video.appendChild(source);
+            video.play();
+
+        }
+        reader.readAsDataURL(event.target.files[0]);
+    }
+
+</script>

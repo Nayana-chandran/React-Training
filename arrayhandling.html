@@ -1,0 +1,243 @@
+<script>    
+    let customerData  = [];
+    // Inserting new customer record into local storage
+    function insert() {		
+        let company  = document.getElementById("company").value;
+        let name   = document.getElementById("name").value;
+        let age = document.getElementById("age").value;
+        if(company == '' || name == '' || age == '') {
+			alert('Please fill all the form fileds!');
+			return false;
+		}
+		if(age > 80) {
+			alert('Customer age should be below 80');
+			document.getElementById("age").value = '';
+			return false;
+		}
+        let obj = {company, name, age};
+        customerData.push(obj);
+        synData(customerData);
+        let customerDetails = JSON.parse(localStorage.getItem("customerString"));
+        clearFileds();
+        displayelements(customerDetails);
+    }
+    
+    function displayelements(customerDetails) {
+		let html = "<table id='customer_data' border='1'><tr><th>Sl No</th><th>Company</th><th>Name</th><th>Age</th><th>Edit</th><th>Delete</th></tr>";
+		if(customerDetails == '') {
+			html+="<tr>No record found!</tr>";
+		} else { 
+			customerDetails.map((values, index) => {
+				html+="<tr id='row_data'>";
+				html+="<td>"+index+"</td>";
+				html+="<td>"+values.company+"</td>";
+				html+="<td>"+values.name+"</td>";
+				html+="<td>"+values.age+"</td>";
+				html+="<td onclick='editRow(" + index + ")'>Edit</td><td onclick='deleteRow(" + index + ")'>Delete</td>";
+				html+="</tr>";
+
+			 } )
+		}
+        html+="</table>";
+        document.getElementById("display").innerHTML = html;
+        clearFileds();
+	}
+	
+    // Edit the customer form with record
+    function editRow(editKey) {
+        document.getElementById("update").value = editKey;
+        document.getElementById("editarea").style.display = "block";
+        document.getElementById("insert").style.display = "none";
+        let customerDetails = JSON.parse(localStorage.getItem("customerString"));
+        customerDetails.map((values, index) => {
+            if (index == editKey) {
+                document.getElementById("company").value = values.company;
+                document.getElementById("name").value = values.name;
+                document.getElementById("age").value = values.age;
+           }
+           synData(customerDetails);
+        })
+    }   
+    
+    // Delete the specific customer record from local storage
+    function deleteRow(deleteKey) {
+        let customerDetails = JSON.parse(localStorage.getItem("customerString"));
+        customerDetails.map((values, index) => {
+            if (index == deleteKey) {
+                customerDetails.splice(index, 1);
+           }
+        })
+        customerData = customerDetails;
+        synData(customerDetails);
+        displayelements(customerDetails);
+    }   
+    
+    // Updating the the customer record
+    function update() {
+        let updateKey  = document.getElementById("update").value;
+        let company  = document.getElementById("company").value;
+        let name   = document.getElementById("name").value;
+        let age = document.getElementById("age").value;
+        if(age > 80) {
+			alert('Customer age should be below 80');
+			document.getElementById("age").value = '';
+			return false;
+		}
+        let customerDetails = JSON.parse(localStorage.getItem("customerString"));
+        customerDetails.map((values, index) => {
+            if (index == updateKey) {
+                values.company = company;
+                values.name = name;
+                values.age = age;
+            }
+        })   
+        synData(customerDetails);
+        displayelements(customerDetails);
+        document.getElementById("editarea").style.display = "none";
+        document.getElementById("insert").style.display = "block";
+    }
+	
+	// Clearing the form input field data 
+	function clearFileds() {
+		document.getElementById("company").value = '';
+        document.getElementById("name").value = '' ;
+        document.getElementById("age").value = '';
+	}
+	    
+    // Cancel the update request for customer record 
+    function cancel() {
+		document.getElementById("editarea").style.display = "none";
+        document.getElementById("insert").style.display = "block";
+        clearFileds();
+	}
+	
+	// Updating local storage data
+	function synData(customerDetails) {
+		localStorage.setItem('customerString', JSON.stringify(customerDetails));
+	}
+	function companyValid() {
+		let text = document.getElementById("company").value;
+		company.value = text.replace(/[^A-Za-z!@#$%^&*)(?><:|}{]/g, "");
+	}
+	
+	function customerValid() {
+		let customer = document.getElementById("name").value;
+		name = customer.replace(/[^A-Za-z]/g, "");
+	}
+	
+	function ageValid() {
+		let numer = document.getElementById("age").value;
+		age.value = numer.replace(/[^0-9]/g,"");
+	}
+	
+	function setTextColor(picker) {
+        document.getElementById('format_background').style.backgroundColor =  picker.toString();
+    }
+
+    function hideShow(hide1, hide2, show) {
+        document.getElementById(hide1).style.display = "none";
+        document.getElementById(hide2).style.display = "none";
+        document.getElementById(show).style.display = "block";
+    }
+	
+    function changeFunc(picker) {
+        if(picker == 'color') {
+            hideShow('backgroundImage', 'backgroundVideo', 'colorpicker');
+        } else if(picker == 'image') {
+            hideShow('colorpicker', 'backgroundVideo', 'backgroundImage');
+        } else if(picker == 'video') {
+            hideShow('backgroundImage', 'colorpicker', 'backgroundVideo');
+        }
+    }
+	
+	// Read and set the browsed image in background
+    function readImage(event) {
+        var reader = new FileReader();
+        reader.onload = function() {
+            backImage = reader.result;
+            document.body.style.backgroundImage = "url(" + backImage + ")";
+            document.body.style.backgroundRepeat = "repeat-y";
+        }
+        reader.readAsDataURL(event.target.files[0]);
+    }
+    
+	// Read and play the browsed video in screen
+    function readVideo(event) {
+        var video = document.getElementById('video');
+        var source = document.createElement('source');
+        var reader = new FileReader();
+        reader.onload = function() {
+            backVideo = reader.result;
+            source.setAttribute('src', backVideo);
+            video.appendChild(source);
+            video.play();
+
+        }
+        reader.readAsDataURL(event.target.files[0]);
+    }
+    
+	function ShowHideDiv() {
+        let  custYes = document.getElementById("isCustomer");
+        let  bckYes = document.getElementById("isBackground");
+        if(custYes.checked) {
+			document.getElementById('customerAction').style.display = "block";
+			document.getElementById('backgroundAction').style.display = "none";
+		} else if(bckYes.checked) {
+			document.getElementById('backgroundAction').style.display = "block";
+			document.getElementById('customerAction').style.display = "none";
+		}
+    }
+</script>
+
+<html>
+<head>
+<title>Array handling</title>
+</head>
+	<script src="jscolor.js"></script>
+    <body id="format_background">
+		<center> 
+		<div id="chooseOption">
+			<input type="radio" name="chooseAction"  id="isCustomer" value="customerAction" onclick="ShowHideDiv()"> Customer Action
+			<input type="radio" name="chooseAction" id="isBackground" value="backgroundAction" onclick="ShowHideDiv()"> Background Action
+		</div>
+		</center>
+		<div id="customerAction" style="display:none;">
+			<h1>Customer data</h1>
+			<label>Company Name *</label>
+			<input id="company" type="text" onkeyup="companyValid()"/>
+			<label>Customer Name *</label>
+			<input id="name" type="text" onkeyup="customerValid()"/>
+			<label>Age *</label>
+			<input id="age" type="text" onkeyup="ageValid()"/></br></br>
+			<button type="button" value="Save&Show" onclick="insert()" id="insert">Save</button>
+			<div id="editarea" style="display:none;">
+				<button type="button" id="update" value="" onclick="update()">Update</button>
+				<button type="button" id="cancel" value="" onclick="cancel()">Cancel</button>
+			</div></br>
+			<div id="display"></div>
+        </div>
+        <div id="backgroundAction" style="display:none;">
+			<div id="background">
+             <select id="selectbackground" onchange="changeFunc(this.value);">
+                <option value="select">Choose any option</option>
+                <option value="color" >Color Picker</option>
+                <option value="image" >Image upload</option>
+                <option value="video" >Video Upload</option>
+              </select>
+			</div>
+			<button id="colorpicker" class="jscolor {valueElement:'chosen-value', onFineChange:'setTextColor(this)'}" style="display:none;">Pick olor</button>
+			<div id="backgroundImage" style="display:none;">
+				<label for="imageupload">Choose a background Image:</label>
+				<input type="file" id="bckimag" name="bckimag" accept="image/png, image/jpeg" onchange="readImage(event);">
+				<img id="output_image"/>
+			</div>
+			<div id="backgroundVideo" style="display:none;">
+				<label for="videoupload">Choose a background Video:</label>
+				<input type="file" id="bckvideo" name="bckvideo" onchange="readVideo(event);">
+				<video id="video"  type="video/webm">
+				</video>
+			</div>
+		</div>
+    </body>
+</html>
+
