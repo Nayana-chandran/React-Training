@@ -6,7 +6,6 @@ function isPalindrome(data) {
       isPalim = false;
     }
   }
-
   if(isPalim) {
     console.log('Yes this is a palindrome');
   } else {
